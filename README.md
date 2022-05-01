@@ -10,7 +10,7 @@
  - **[License](#license)**
   
 ## Overview
-"University Management System" is a practice-purpose project for OOP with C++ and database's design and usage. The project requires a relational database to store operations' output and to handle the login phase (local MySQL server, at the moment).
+"Library Management System" is a practice-purpose project for OOP with C++ and database's design and usage. The project requires a relational database to store operations' output and to handle the login phase (local MySQL server, at the moment).
 
 ## Tech
 | Tech | Documentation |
