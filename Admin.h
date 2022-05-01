@@ -2,7 +2,7 @@
 
 #include "Person.h"
 
-class Admin : private Person {
+class Admin : public Person {
     private:
         int a_id;
         string a_name;
@@ -11,11 +11,24 @@ class Admin : private Person {
         string a_role;
 
     public:
-        Admin(int a_id, string a_name, string a_surname, string a_password, string role) : Person(a_id, a_name, a_surname, a_password)
-        {
-            setRole(role);
-        };
+        Admin(){};
+        Admin(int id, string name, string surname, string password, string role)
+            : Person{ id, name, surname, password }
+            {
+                setRole(role);
+            };
         void setRole(string role){
             a_role = role;
         }
+        // Getters
+        string getRole(){
+            return a_role;
+        }
+        string getName(){
+            return a_name;
+        }
+        string getSurname(){
+            return a_surname;
+        }
+
 };
