@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 
 using std::string;
@@ -10,6 +11,7 @@ class Person{
         string p_password;
 
     public:
+        Person(){};
         Person(int id, string name, string surname, string password){
             setId(id);
             setName(name);
@@ -28,5 +30,9 @@ class Person{
         }
         void setPassword(string password){
             p_password = password;
+        }
+        // Getters
+        int getId(){
+            return p_id;
         }
 };
