@@ -25,33 +25,59 @@ int main(){
             case 1:
             {
                 // Login
-                int loginType = SelectType();
-                switch(loginType){
-                    case 1:
-                    {
-                        // Login -> User
-                        string userData[3];
-                        CollectUserData(userData);
-                        user = LoginUser(con, userData);
-                        isUserLoggedin = true;
-                        cout << "Welcome back, " << user.getName()  << "!" << endl;
-                        break;
-                    }
+                do{
+                    int loginType = SelectType();
+                    switch(loginType){
+                        case 1:
+                        {
+                            // Login -> User
+                            string userData[3];
+                            CollectUserData(userData);
+                            user = LoginUser(con, userData);
+                            isUserLoggedin = true;
+                            cout << "Welcome back, " << user.getName()  << "!" << endl;
+                            break;
+                        }
 
-                    case 2:
-                    {
-                        // Login -> Admin
-                        string adminData[3];
-                        CollectUserData(adminData);
-                        admin = LoginAdmin(con, adminData);
-                        cout << "Welcome back, " << admin.getName() << "!" << endl;
-                        break;
+                        case 2:
+                        {
+                            // Login -> Admin
+                            string adminData[3];
+                            CollectUserData(adminData);
+                            admin = LoginAdmin(con, adminData);
+                            isAdminLoggedin = true;
+                            cout << "Welcome back, " << admin.getName() << "!" << endl;
+                            break;
+                        }
                     }
-                }
+                }while(!isUserLoggedin && !isAdminLoggedin);
+                break;
+            }
+
+            case 2:
+            {
+                // Registration (standard user only)
+                bool isPasswordValid = false;
+                do{
+                    string userData[3];
+                    CollectUserData(userData);
+                    cout << "Confirm your password: ";
+                    string passwordConfirmation;
+                    getline(cin, passwordConfirmation);
+                    if(passwordConfirmation.compare(userData[2]) == 0){
+                        RegisterUser(con, userData);
+                    }
+                }while(!isPasswordValid);
+            }
+
+            case 3:
+            {
+                cout << "Program ended. Please, wait..." << endl;
+                delete con;
+                isStillWorking = false;
             }
         }      
     }while(isStillWorking);
-
 
     exit(EXIT_SUCCESS);
 }
