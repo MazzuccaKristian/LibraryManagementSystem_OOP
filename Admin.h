@@ -24,11 +24,4 @@ class Admin : public Person {
         string getRole(){
             return a_role;
         }
-        string getName(){
-            return a_name;
-        }
-        string getSurname(){
-            return a_surname;
-        }
-
 };
