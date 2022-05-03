@@ -14,11 +14,4 @@ class User : public Person {
         User(int id, string name, string surname, string password)
             : Person{ id, name, surname, password }
             {};
-        // Getters
-        string getName(){
-            return u_name;
-        }
-        string getSurname(){
-            return u_surname;
-        }
 };
