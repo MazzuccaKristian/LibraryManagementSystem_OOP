@@ -31,8 +31,9 @@
         PersonID INT AUTO_INCREMENT PRIMARY KEY,
         Name VARCHAR(50) NOT NULL,
         Surname VARCHAR(50) NOT NULL,
+        Password VARCHAR(20) NOT NULL,
         isAdmin TINYINT(1) DEFAULT 0,
-        Role VARCHAR(30) NOT NULL );
+        Role VARCHAR(30));
     --- Table 'Book'
     CREATE TABLE IF NOT EXISTS Book (
         BookID INT AUTO_INCREMENT PRIMARY KEY,
@@ -48,7 +49,7 @@
     ```
 7. Grant privileges:
     ```sql
-    GRANT PRIVILEGES SELECT ON LibraryDB.* TO 'libraryuser'@'localhost'; 
+    GRANT SELECT, INSERT ON LibraryDB.* TO 'libraryuser'@'localhost'; 
     ```
 
 ## License
