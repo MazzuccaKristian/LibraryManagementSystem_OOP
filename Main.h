@@ -2,97 +2,95 @@
 #include <string>
 
 #include "DBHandler.h"
+#include "Admin.h"
+#include "User.h"
 
 using std::cin;
 using std::cout;
 using std::endl;
 using std::string;
 
-int LoginPhase(sql::Connection *connection);
-void ShowLoginMenu();
-int RetrieveLoginChoice();
-int Login(sql::Connection *connection);
-// int ValidateChoice(string input);
+void LoginMenu();
+int LoginMenu_Choice();
+int SelectType();
+void CollectUserData(string *record);
+User LoginUser(sql::Connection *connection, string *record);
+Admin LoginAdmin(sql::Connection *connection, string *record);
 
-/**
- * @brief
- * Login phase:
- * 1: Login or registration?
- * - 1.1: Login.
- *
- * @return int
- */
-int LoginPhase(sql::Connection *connection){
-    bool isChoiceValid = false;
-    int userID;
-    do{
-        ShowLoginMenu();
-        int choice = RetrieveLoginChoice();
-        switch(choice){
-            case 1:
-                // Login process
-                userID = Login(connection);
-                break;
-
-            case 3:
-                exit(EXIT_SUCCESS);
-        }
-    } while (!isChoiceValid);
-    return userID;
-}
-
-/**
- * @brief Login Menu
- * 
- */
-void ShowLoginMenu()
-{
+void LoginMenu(){
     cout << "-- LOGIN MENU --" << endl;
     cout << "1. Login;" << endl;
     cout << "2. Registration;" << endl;
     cout << "3. Exit." << endl;
 }
 
-/**
- * @brief Retrieve input from user and return a valid option.
- * 
- * @return int 
- */
-int RetrieveLoginChoice()
-{
-    string rawInput;
-    bool isValid = false;
-        int choice;
-    do
-    {
+int LoginMenu_Choice(){
+    bool isChoiceValid = false;
+    int choice;
+    do{
         cout << "Enter your option: ";
-        getline(cin, rawInput);
-        try{
-            choice = std::stoi(rawInput);
-        }catch (std::invalid_argument exception){
-            perror(exception.what());
-        }
+        cin >> choice;
         if(choice >= 1 && choice <= 3){
-            isValid = true;
+            isChoiceValid = true;
         }else{
-            isValid = false;
             cout << "Option not allowed." << endl;
         }
-    }while (!isValid);
+    }while(!isChoiceValid);
     return choice;
 }
 
-int Login(sql::Connection *connection){
-    string name, surname, password;
+int SelectType(){
+    bool isTypeValid = false;
+    int type;
+    cout << "Enter the type of user:" << endl;
+    cout << "1. User;" << endl;
+    cout << "2. Admin." << endl;
+    do{
+        cout << "Enter your option: ";
+        cin >> type;
+        if(type == 1 || type ==2){
+            isTypeValid = true;
+        }else{
+            cout << "Option not allowed." << endl;
+        }
+    }while(!isTypeValid);
+    return type;
+}
+
+void CollectUserData(string *record){
+    cin.ignore();
     cout << "Enter your name: ";
+    string name;
     getline(cin, name);
     cout << "Enter your surname: ";
+    string surname;
     getline(cin, surname);
     cout << "Enter your password: ";
+    string password;
     getline(cin, password);
-    sql::ResultSet *loginquery_res = DB_Login(connection, name, surname, password);
-    if(loginquery_res -> next()){
-        cout << "RES_ " << loginquery_res -> getInt("PersonID") << endl;
+    record[0] = name;
+    record[1] = surname;
+    record[2] = password;
+}
+
+User LoginUser(sql::Connection *connection, string *record){
+    sql::ResultSet *loginResult = DB_LoginUser(connection, record);
+    int id;
+    if(loginResult -> next()){
+        id = loginResult -> getInt("PersonID");
     }
-    return 1;
+    User user(id, record[0], record[1], record[2]);
+    return user;
+}
+
+Admin LoginAdmin(sql::Connection *connection, string *record){
+    sql::ResultSet *loginResult = DB_LoginAdmin(connection, record);
+    int id;
+    string role;
+    if(loginResult -> next()){
+        id = loginResult -> getInt("PersonID");
+        role = loginResult -> getString("Role");
+    }
+    Admin admin(id, record[0], record[1], record[2], role);
+    return admin;
 }
