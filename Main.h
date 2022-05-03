@@ -2,8 +2,8 @@
 #include <string>
 
 #include "DBHandler.h"
-#include "Admin.h"
-#include "User.h"
+#include "Classes/Admin.h"
+#include "Classes/User.h"
 
 using std::cin;
 using std::cout;
@@ -16,6 +16,7 @@ int SelectType();
 void CollectUserData(string *record);
 User LoginUser(sql::Connection *connection, string *record);
 Admin LoginAdmin(sql::Connection *connection, string *record);
+void RegisterUser(sql::Connection *connection, string *record);
 
 void LoginMenu(){
     cout << "-- LOGIN MENU --" << endl;
@@ -80,6 +81,7 @@ User LoginUser(sql::Connection *connection, string *record){
         id = loginResult -> getInt("PersonID");
     }
     User user(id, record[0], record[1], record[2]);
+    delete loginResult;
     return user;
 }
 
@@ -92,5 +94,11 @@ Admin LoginAdmin(sql::Connection *connection, string *record){
         role = loginResult -> getString("Role");
     }
     Admin admin(id, record[0], record[1], record[2], role);
+    delete loginResult;
     return admin;
+}
+
+void RegisterUser(sql::Connection *connection, string *record){
+    DB_RegisterUser(connection, record);
+    cout << "Registration completed!" << endl;
 }
