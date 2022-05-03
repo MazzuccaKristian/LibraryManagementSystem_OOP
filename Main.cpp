@@ -2,12 +2,10 @@
 
 #include <iostream>
 
-using namespace std;
-
-
-int main(int argc, char **argv){
+int main(){
     bool isStillWorking = true;
     bool isUserLoggedin = false;
+    bool isAdminLoggedin = false;
 
     Admin admin;
     User user;
@@ -21,59 +19,37 @@ int main(int argc, char **argv){
     }
 
     do{
-        if(!isUserLoggedin){
-            // Login phase
-            LoginMenu();
-            int userChoice = RetrieveLoginChoice();
-            switch(userChoice){
-                case 1:
-                {
-                    // User/Admin login
-                    sql::ResultSet *loginResult = Login(con);
-                    if(loginResult -> next()){
-                        int id = loginResult -> getInt("PersonID");
-                        bool isAdmin = loginResult -> getInt("isAdmin");
-                        string name = loginResult -> getString("Name");
-                        string surname = loginResult -> getString("Surname");
-                        string password = loginResult -> getString("Password");
-                        string role = loginResult -> getString("Role");
-                        switch(isAdmin){
-                            case 0:
-                            // Standard user
-                            {
-                                user = User(id, name, surname, password);
-                                cout << "Welcome back!" << endl;
-                                isUserLoggedin = true;
-                                break;
-                            }
-
-                            case 1:
-                            // Admin
-                            {
-                                admin = Admin(id, name, surname, password, role);
-                                cout << "Welcome back!" << endl;
-                                isUserLoggedin = true;
-                                break;
-                            }
-                        }
+        LoginMenu();
+        int loginChoice = LoginMenu_Choice();
+        switch(loginChoice){
+            case 1:
+            {
+                // Login
+                int loginType = SelectType();
+                switch(loginType){
+                    case 1:
+                    {
+                        // Login -> User
+                        string userData[3];
+                        CollectUserData(userData);
+                        user = LoginUser(con, userData);
+                        isUserLoggedin = true;
+                        cout << "Welcome back, " << user.getName()  << "!" << endl;
+                        break;
                     }
-                    break;
-                }
 
-                case 2:
-                // Registration
-                {
-                    
-                }
-
-                case 3:
-                {
-                    cout << "Program ended. Please, wait..." << endl;
-                    isStillWorking = false;
-                    break;
+                    case 2:
+                    {
+                        // Login -> Admin
+                        string adminData[3];
+                        CollectUserData(adminData);
+                        admin = LoginAdmin(con, adminData);
+                        cout << "Welcome back, " << admin.getName() << "!" << endl;
+                        break;
+                    }
                 }
             }
-        }
+        }      
     }while(isStillWorking);
 
 
