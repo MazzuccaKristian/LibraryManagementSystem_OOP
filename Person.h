@@ -35,4 +35,13 @@ class Person{
         int getId(){
             return p_id;
         }
+        string getName(){
+            return p_name;
+        }
+        string getSurname(){
+            return p_name;
+        }
+        string getPassword(){
+            return p_password;
+        }
 };
