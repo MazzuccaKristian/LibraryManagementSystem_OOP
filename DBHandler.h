@@ -15,10 +15,14 @@ const string DB_User = "libraryuser";
 const string DB_Password = "Password1!";
 
 const string UseSchemaQuery = "USE LibraryDB";
-const string LoginQuery = "SELECT * FROM User WHERE Name = ? AND Surname = ? AND Password = ?";
+const string LoginQuery_User = "SELECT PersonID FROM User WHERE Name = ? AND Surname = ? AND Password = ? AND isAdmin = 0";
+const string LoginQuery_Admin = "SELECT PersonID, Role FROM User WHERE Name = ? AND Surname = ? AND Password = ? AND isAdmin = 1";
+const string RegistrationQuery_User = "INSERT INTO User(Name, Surname, Password) VALUES (?, ?, ?)";
 
 sql::Connection *HandlerSetup();
-sql::ResultSet *DB_Login(sql::Connection *con, string name, string surname, string password);
+sql::ResultSet *DB_LoginUser(sql::Connection *connection, string *record);
+sql::ResultSet *DB_LoginAdmin(sql::Connection *connection, string *record);
+void DB_RegisterUser(sql::Connection *connection, string *record);
 
 sql::Connection *HandlerSetup(){
     sql::Driver *driver;
@@ -37,20 +41,55 @@ sql::Connection *HandlerSetup(){
     return connection;
 }
 
-sql::ResultSet *DB_Login(sql::Connection *con, string name, string surname, string password){
+sql::ResultSet *DB_LoginUser(sql::Connection *connection, string *record){
+    sql::PreparedStatement *p_stmt;
     sql::ResultSet *result;
-    if(con -> isValid()){
-        sql::PreparedStatement *p_stmt;
+    if (connection->isValid())
+    {
+        p_stmt = connection -> prepareStatement(LoginQuery_User);
         try{
-            p_stmt = con -> prepareStatement(LoginQuery);
-            p_stmt -> setString(1, name);
-            p_stmt -> setString(2, surname);
-            p_stmt -> setString(3, password);
-            result = p_stmt -> executeQuery();
-        }catch(sql::SQLException e){
-            std::perror(e.what());
+            p_stmt -> setString(1, record[0]);
+            p_stmt -> setString(2, record[1]);
+            p_stmt -> setString(3, record[2]);
+            result = p_stmt ->executeQuery();
+        }catch(sql::SQLException *exception){
+            std::perror(exception -> what());
         }
-        delete p_stmt;
     }
+    delete p_stmt;
     return result;
+}
+
+sql::ResultSet *DB_LoginAdmin(sql::Connection *connection, string *record){
+    sql::PreparedStatement *p_stmt;
+    sql::ResultSet *result;
+    if(connection -> isValid()){
+        p_stmt = connection -> prepareStatement(LoginQuery_Admin);
+        try{
+            p_stmt -> setString(1, record[0]);
+            p_stmt -> setString(2, record[1]);
+            p_stmt -> setString(3, record[2]);
+            result = p_stmt -> executeQuery();
+        }catch(sql::SQLException *exception){
+            std::perror(exception -> what());
+        }
+    }
+    delete p_stmt;
+    return result;
+}
+
+void DB_RegisterUser(sql::Connection *connection, string *record){
+    sql::PreparedStatement *p_stmt;
+    if(connection -> isValid()){
+        p_stmt = connection -> prepareStatement(RegistrationQuery_User);
+        try{
+            p_stmt -> setString(1, record[0]);
+            p_stmt -> setString(2, record[1]);
+            p_stmt -> setString(3, record[2]);
+            p_stmt -> execute();
+        }catch(sql::SQLException *exception){
+            std::perror(exception -> what());
+        }
+    }
+    delete p_stmt;
 }
