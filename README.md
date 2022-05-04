@@ -41,7 +41,8 @@
         Author VARCHAR(30) NOT NULL,
         PublishingYear INT NOT NULL,
         Edition INT DEFAULT 1,
-        Editor VARCHAR(30) NOT NULL );
+        Editor VARCHAR(30) NOT NULL,
+        Copies INT NOT NULL DEFAULT 1 );
     --- Table 'Rent'
     CREATE TABLE IF NOT EXISTS Rent(
 	    BookID INT,
