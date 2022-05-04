@@ -18,11 +18,13 @@ const string UseSchemaQuery = "USE LibraryDB";
 const string LoginQuery_User = "SELECT PersonID FROM User WHERE Name = ? AND Surname = ? AND Password = ? AND isAdmin = 0";
 const string LoginQuery_Admin = "SELECT PersonID, Role FROM User WHERE Name = ? AND Surname = ? AND Password = ? AND isAdmin = 1";
 const string RegistrationQuery_User = "INSERT INTO User(Name, Surname, Password) VALUES (?, ?, ?)";
+const string SearchBookQuery = "SELECT * FROM Book WHERE Title = ?";
 
 sql::Connection *HandlerSetup();
 sql::ResultSet *DB_LoginUser(sql::Connection *connection, string *record);
 sql::ResultSet *DB_LoginAdmin(sql::Connection *connection, string *record);
 void DB_RegisterUser(sql::Connection *connection, string *record);
+sql::ResultSet *DB_SearchBook(sql::Connection *connection, string book);
 
 sql::Connection *HandlerSetup(){
     sql::Driver *driver;
@@ -92,4 +94,20 @@ void DB_RegisterUser(sql::Connection *connection, string *record){
         }
     }
     delete p_stmt;
+}
+
+sql::ResultSet *DB_SearchBook(sql::Connection *connection, string book){
+    sql::PreparedStatement *p_stmt;
+    sql::ResultSet *searchResult;
+    if(connection -> isValid()){
+        try{
+            p_stmt = connection -> prepareStatement(SearchBookQuery);
+            p_stmt -> setString(1, book);
+            searchResult = p_stmt -> executeQuery();
+        }catch(sql::SQLException *exception){
+            std::perror(exception -> what());
+        }
+    }
+    delete p_stmt;
+    return searchResult;
 }
