@@ -42,6 +42,39 @@
         PublishingYear INT NOT NULL,
         Edition INT DEFAULT 1,
         Editor VARCHAR(30) NOT NULL );
+    --- Table 'Rent'
+    CREATE TABLE IF NOT EXISTS Rent(
+	    BookID INT,
+	    PersonID INT,
+	    RentDate DATE NOT NULL,
+	    ReturnDate DATE NOT NULL,
+	    PRIMARY KEY(BookID, PersonID, RentDate) );
+    --- Table 'Returning'
+    CREATE TABLE IF NOT EXISTS Returning(
+	    BookID INT,
+	    PersonID INT,
+	    ReturnDate DATE NOT NULL,
+	    PRIMARY KEY(BookID, PersonID, ReturnDate) );
+    --- Constraints
+    ALTER TABLE Rent ADD CONSTRAINT fk_Rent_BookID 
+    FOREIGN KEY (BookID) REFERENCES Book(BookID)
+    ON UPDATE CASCADE 
+    ON DELETE RESTRICT;
+
+    ALTER TABLE Rent ADD CONSTRAINT fk_Rent_PersonID
+    FOREIGN KEY (PersonID) REFERENCES User(PersonID)
+    ON UPDATE CASCADE
+    ON DELETE RESTRICT;
+
+    ALTER TABLE Returning ADD CONSTRAINT fk_Returning_BookID
+    FOREIGN KEY (BookID) REFERENCES Book(BookID)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE;
+
+    ALTER TABLE Returning ADD CONSTRAINT fk_Returning_PersonID
+    FOREIGN KEY (PersonID) REFERENCES User(PersonID)
+    ON UPDATE CASCADE
+    ON DELETE RESTRICT;
    ```
 6. Create the user:
     ```sql
