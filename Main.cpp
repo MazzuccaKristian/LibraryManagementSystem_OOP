@@ -76,7 +76,19 @@ int main(){
                 delete con;
                 isStillWorking = false;
             }
-        }      
+        }
+
+        if(isUserLoggedin){
+        // USER application
+            UserMenu();
+            int userChoice = UserMenu_Choice();
+            switch(userChoice){
+                case 1:
+                // Search for a book
+                user.SearchBook(con);
+            }
+        }
+             
     }while(isStillWorking);
 
     exit(EXIT_SUCCESS);
