@@ -44,4 +44,18 @@ class Person{
         string getPassword(){
             return p_password;
         }
+
+        string FormatTitleString(string rawTitle);
+
 };
+
+string Person::FormatTitleString(string rawTitle){
+    string title = rawTitle;
+    int cursor = title.find_first_of(' ');
+    int end = title.size();
+    while(cursor < end && cursor != title.npos){
+        title = title.replace(cursor, 1, "_");
+        cursor = title.find_first_of(' ');
+    }
+    return title;
+}
