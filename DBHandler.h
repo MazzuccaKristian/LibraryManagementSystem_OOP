@@ -19,12 +19,15 @@ const string LoginQuery_User = "SELECT PersonID FROM User WHERE Name = ? AND Sur
 const string LoginQuery_Admin = "SELECT PersonID, Role FROM User WHERE Name = ? AND Surname = ? AND Password = ? AND isAdmin = 1";
 const string RegistrationQuery_User = "INSERT INTO User(Name, Surname, Password) VALUES (?, ?, ?)";
 const string SearchBookQuery = "SELECT * FROM Book WHERE Title = ?";
+const string CountRentedBooks = "SELECT COUNT(DISTINCT BookID) AS Counter FROM Rent WHERE PersonID = ? AND ReturnDate > CURDATE()";
 
 sql::Connection *HandlerSetup();
 sql::ResultSet *DB_LoginUser(sql::Connection *connection, string *record);
 sql::ResultSet *DB_LoginAdmin(sql::Connection *connection, string *record);
 void DB_RegisterUser(sql::Connection *connection, string *record);
 sql::ResultSet *DB_SearchBook(sql::Connection *connection, string book);
+bool DB_CanUserRent(sql::Connection *connection, int userID);
+void DB_RentBook(sql::Connection *connection, string title, int userID);
 
 sql::Connection *HandlerSetup(){
     sql::Driver *driver;
@@ -110,4 +113,36 @@ sql::ResultSet *DB_SearchBook(sql::Connection *connection, string book){
     }
     delete p_stmt;
     return searchResult;
+}
+
+bool DB_CanUserRent(sql::Connection *connection, int userID){
+    bool canUserRent = false;
+    if(connection -> isValid()){
+        sql::PreparedStatement *p_stmt;
+        sql::ResultSet *queryResult;
+        try{
+            p_stmt = connection -> prepareStatement(CountRentedBooks);
+            p_stmt -> setInt(1, userID);
+            queryResult = p_stmt -> executeQuery();
+            if(queryResult -> next()){
+                int counter = queryResult -> getInt("Counter");
+                if(counter < 5){
+                    canUserRent = true;
+                }
+            }
+        }catch(sql::SQLException *exception){
+            std::perror(exception -> what());
+        }
+        delete p_stmt;
+        delete queryResult;
+    }
+    return canUserRent;
+}
+
+void DB_RentBook(sql::Connection *connection, string title, int userID){
+    if(connection -> isValid()){
+        sql::PreparedStatement *p_stmt;
+        // Search book -> decrement copies -> insert row for Rent
+        
+    }
 }
