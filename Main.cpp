@@ -85,7 +85,11 @@ int main(){
             switch(userChoice){
                 case 1:
                 // Search for a book
-                user.SearchBook(con);
+                    user.SearchBook(con);
+                    break;
+
+                case 2:
+                    user.RentBook(con);
             }
         }
              
