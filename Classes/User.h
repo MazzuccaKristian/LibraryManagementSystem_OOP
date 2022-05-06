@@ -24,10 +24,13 @@ class User : public Person {
     //     string FormatTitleString(string rawTitle);
 
     public:
-        void SearchBook(sql::Connection *connection);
+        bool SearchBook(sql::Connection *connection);
+        void RentBook(sql::Connection *connection);
+        string TitleInput();
 };
 
-void User::SearchBook(sql::Connection *connection){
+bool User::SearchBook(sql::Connection *connection){
+    bool found = false;
     cout << "Enter the title: ";
     string raw, title;
     cin.ignore();
@@ -44,9 +47,27 @@ void User::SearchBook(sql::Connection *connection){
                 }else{
                     cout << raw << ", edition " << edition << " is available! " << copies << " copies left." << endl;
                 }
+                found = true;
             }
         }
     }else{
         cout << "Sorry, " << raw << " is not available..." << endl;
+    }
+    return found;
+}
+
+void User::RentBook(sql::Connection *connection){
+    // Check if user can rent a book (MAX = 5)
+    bool canRent = DB_CanUserRent(connection, this -> getId());
+    if(canRent){
+        // TODO: Search book (latest edition?). If found then rent it.
+        cout << "Enter the title: ";
+        string rawTitle;
+        getline(cin, rawTitle);
+        string title = FormatTitleString(rawTitle);
+        DB_RentBook(connection, title, this -> getId());
+
+    }else{
+        cout << "You cannot rent more then five books." << endl;
     }
 }
