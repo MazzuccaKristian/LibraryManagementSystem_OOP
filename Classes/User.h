@@ -60,12 +60,13 @@ void User::RentBook(sql::Connection *connection){
     // Check if user can rent a book (MAX = 5)
     bool canRent = DB_CanUserRent(connection, this -> getId());
     if(canRent){
-        // TODO: Search book (latest edition?). If found then rent it.
+        cin.ignore();
         cout << "Enter the title: ";
         string rawTitle;
         getline(cin, rawTitle);
         string title = FormatTitleString(rawTitle);
         DB_RentBook(connection, title, this -> getId());
+        cout << "Thank you!" << endl;
 
     }else{
         cout << "You cannot rent more then five books." << endl;
