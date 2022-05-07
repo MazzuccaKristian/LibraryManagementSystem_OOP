@@ -22,6 +22,7 @@ const string SearchBookQuery = "SELECT * FROM Book WHERE Title = ?";
 const string CountRentedBooks = "SELECT COUNT(DISTINCT BookID) AS Counter FROM Rent WHERE PersonID = ? AND ReturnDate > CURDATE()";
 const string DecrementCopiesQuery = "UPDATE Book SET Copies = Copies - 1 WHERE BookID = ?";
 const string RentQuery = "INSERT INTO Rent(BookID, PersonID, RentDate, ReturnDate) VALUES (?, ?, CURDATE(), CURDATE() + 14)";
+const string RentedBooks = "SELECT DISTINCT Title FROM Rent WHERE UserID = ?";
 
 sql::Connection *HandlerSetup();
 sql::ResultSet *DB_LoginUser(sql::Connection *connection, string *record);
@@ -32,7 +33,10 @@ bool DB_CanUserRent(sql::Connection *connection, int userID);
 void DB_RentBook(sql::Connection *connection, string title, int userID);
 int DB_SearchBookForRent(sql::Connection *connection, string title);
 void DB_DecrementCopies(sql::Connection *connection, int bookID);
-void DB_Rent( sql::Connection *connection, int userID, int bookID);
+void DB_Rent(sql::Connection *connection, int userID, int bookID);
+int DB_CountRentedBooks(sql::Connection *connection, int userID);
+bool DB_CheckRentedBook(sql::Connection *connection, int userID, string title);
+void DB_ReturnBook(sql::Connection *connection, int userID, string title);
 
 sql::Connection *HandlerSetup(){
     sql::Driver *driver;
@@ -205,5 +209,56 @@ void DB_Rent( sql::Connection *connection, int userID, int bookID){
             std::perror(exception -> what());
         }
         delete p_stmt;
+    }
+}
+
+int DB_CountRentedBooks(sql::Connection *connection, int userID){
+    int counter = 0;
+    if(connection -> isValid()){
+        sql::PreparedStatement *p_stmt;
+        sql::ResultSet *countResult;
+        try{
+            p_stmt = connection -> prepareStatement(CountRentedBooks);
+            p_stmt -> setInt(1, userID);
+            countResult = p_stmt -> executeQuery();
+            if(countResult -> next()){
+                counter = countResult -> getInt("Counter");
+            }
+        }catch(sql::SQLException *exception){
+            std::perror(exception -> what());
+        }
+        delete p_stmt;
+        delete countResult;
+    }
+    return counter;
+}
+
+bool DB_CheckRentedBook(sql::Connection *connection, int userID, string title){
+    bool userRentedIt = false;
+    if(connection -> isValid()){
+        sql::PreparedStatement *p_stmt;
+        sql::ResultSet *queryResult;
+        try{
+            p_stmt = connection -> prepareStatement(RentedBooks);
+            p_stmt -> setInt(1, userID);
+            queryResult = p_stmt -> executeQuery();
+            while(queryResult -> next()){
+                string retrivedTitle = queryResult -> getString("Title");
+                if(retrivedTitle.compare(title) == 0){
+                    userRentedIt = true;
+                }
+            }
+        }catch(sql::SQLException *exception){
+            std::perror(exception -> what());
+        }
+        delete p_stmt;
+        delete queryResult;
+    }
+    return userRentedIt;
+}
+
+void DB_ReturnBook(sql::Connection *connection, int userID, string title){
+    if(connection -> isValid()){
+        
     }
 }
