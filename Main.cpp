@@ -90,6 +90,10 @@ int main(){
 
                 case 2:
                     user.RentBook(con);
+                    break;
+
+                case 3:
+                    user.ReturnBook(con);
             }
         }
              
