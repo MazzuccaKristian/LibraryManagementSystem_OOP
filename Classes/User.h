@@ -27,6 +27,7 @@ class User : public Person {
         bool SearchBook(sql::Connection *connection);
         void RentBook(sql::Connection *connection);
         string TitleInput();
+        void ReturnBook(sql::Connection *connection)
 };
 
 bool User::SearchBook(sql::Connection *connection){
@@ -70,5 +71,25 @@ void User::RentBook(sql::Connection *connection){
 
     }else{
         cout << "You cannot rent more then five books." << endl;
+    }
+}
+
+void User::ReturnBook(sql::Connection *connection){
+    if(connection -> isValid()){
+        if(DB_CountRentedBooks(connection, this -> getId()) < 1){
+            cout << "You don't need to return..." << endl;
+        }else{
+            // book's title -> remove from Rent -> insert into Returning
+            cout << "Enter title: ";
+            string title;
+            cin.ignore();
+            getline(cin, title);
+            if(DB_CheckRentedBook(connection, this -> getId(), title)){
+                // User rented the specified book.
+                DB_ReturnBook(connection, this -> getId(), title);
+            }else{
+                cout << "You didn't rent " << title << "..." << endl;
+            }
+        }
     }
 }
