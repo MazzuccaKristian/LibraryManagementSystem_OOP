@@ -83,7 +83,8 @@
     ```
 7. Grant privileges:
     ```sql
-    GRANT SELECT, INSERT ON LibraryDB.* TO 'libraryuser'@'localhost'; 
+    GRANT SELECT, INSERT, UPDATE ON LibraryDB.* TO 'libraryuser'@'localhost'; 
+    GRANT DELETE ON LibraryDB.Rent TO 'libraryuser'@'localhost';
     ```
 
 ## License
