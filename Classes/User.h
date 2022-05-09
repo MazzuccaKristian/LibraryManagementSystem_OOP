@@ -27,7 +27,7 @@ class User : public Person {
         bool SearchBook(sql::Connection *connection);
         void RentBook(sql::Connection *connection);
         string TitleInput();
-        void ReturnBook(sql::Connection *connection)
+        void ReturnBook(sql::Connection *connection);
 };
 
 bool User::SearchBook(sql::Connection *connection){
@@ -81,12 +81,14 @@ void User::ReturnBook(sql::Connection *connection){
         }else{
             // book's title -> remove from Rent -> insert into Returning
             cout << "Enter title: ";
-            string title;
+            string title, raw;
             cin.ignore();
-            getline(cin, title);
-            if(DB_CheckRentedBook(connection, this -> getId(), title)){
+            getline(cin, raw);
+            title = FormatTitleString(raw);
+            int rentedBook_ID = DB_CheckRentedBook(connection, this -> getId(), title);
+            if(rentedBook_ID > 0){
                 // User rented the specified book.
-                DB_ReturnBook(connection, this -> getId(), title);
+                DB_ReturnBook(connection, this -> getId(), rentedBook_ID);
             }else{
                 cout << "You didn't rent " << title << "..." << endl;
             }
