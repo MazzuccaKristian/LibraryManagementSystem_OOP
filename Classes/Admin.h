@@ -24,4 +24,24 @@ class Admin : public Person {
         string getRole(){
             return a_role;
         }
+        void AddNewAdmin(sql::Connection *connection);
 };
+
+void Admin::AddNewAdmin(sql::Connection *connection){
+    string adminRecord[4];
+    std::cin.ignore();
+    std::cout << "Enter name: ";
+    getline(std::cin, adminRecord[0]);
+    std::cout << "Enter surname: ";
+    getline(std::cin, adminRecord[1]);
+    std::cout << "Enter password: ";
+    getline(std::cin, adminRecord[2]);
+    std::cout << "Enter role: ";
+    getline(std::cin, adminRecord[3]);
+    bool result = DB_RegisterAdmin(connection, adminRecord); 
+    if(result){
+        std::cout << "OK" << std::endl;
+    }else{
+        std::cout << "NO" << std::endl;
+    }
+}
