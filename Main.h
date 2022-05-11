@@ -4,6 +4,7 @@
 #include "DBHandler.h"
 #include "Classes/Admin.h"
 #include "Classes/User.h"
+#include "Classes/Person.h"
 
 using std::cin;
 using std::cout;
@@ -18,6 +19,8 @@ User LoginUser(sql::Connection *connection, string *record);
 Admin LoginAdmin(sql::Connection *connection, string *record);
 void RegisterUser(sql::Connection *connection, string *record);
 void UserMenu();
+void AdminMenu();
+int AdminMenu_Choice();
 int UserMenu_Choice();
 void SearchBook(sql::Connection *connection, string book);
 
@@ -113,6 +116,27 @@ void UserMenu(){
     cout << "3. Return a book;" << endl;
     cout << "4. Postpone book's return date;" << endl;
     cout << "5. Exit." << endl;
+}
+
+void AdminMenu(){
+    cout << "--- MENU ---" << endl;
+    cout << "1. Add new admin;" << endl;
+    cout << "x. Exit." << endl;
+}
+
+int AdminMenu_Choice(){
+    int choice;
+    bool isChoiceValid = false;
+    do{
+        cout << "Enter your option: ";
+        cin >> choice;
+        if(choice > 0 && choice < 2){
+            isChoiceValid = true;
+        }else{
+            cout << "Option not allowed." << endl;
+        }
+    }while(!isChoiceValid);
+    return choice;
 }
 
 int UserMenu_Choice(){
