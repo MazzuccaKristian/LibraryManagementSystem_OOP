@@ -22,7 +22,10 @@ const string SearchBookQuery = "SELECT * FROM Book WHERE Title = ?";
 const string CountRentedBooks = "SELECT COUNT(DISTINCT BookID) AS Counter FROM Rent WHERE PersonID = ? AND ReturnDate > CURDATE()";
 const string DecrementCopiesQuery = "UPDATE Book SET Copies = Copies - 1 WHERE BookID = ?";
 const string RentQuery = "INSERT INTO Rent(BookID, PersonID, RentDate, ReturnDate) VALUES (?, ?, CURDATE(), CURDATE() + 14)";
-const string RentedBooks = "SELECT DISTINCT Title FROM Rent WHERE UserID = ?";
+const string RentedBooks = "SELECT DISTINCT R.BookID, Title FROM Rent AS R JOIN Book AS B ON R.BookID = B.BookID WHERE PersonID = ?";
+const string ReturnBook_DeleteRow = "DELETE FROM Rent WHERE PersonID = ? AND BookID = ?";
+const string ReturnBook_InsertRow = "INSERT INTO Returning(PersonID, BookID, ReturnDate) VALUES (?, ?, CURDATE())";
+const string RegistrationQuery_Admin = "INSERT INTO User(Name, Surname, Password, isAdmin, Role) VALUES (?, ?, ?, ?, ?)";
 
 sql::Connection *HandlerSetup();
 sql::ResultSet *DB_LoginUser(sql::Connection *connection, string *record);
@@ -35,8 +38,9 @@ int DB_SearchBookForRent(sql::Connection *connection, string title);
 void DB_DecrementCopies(sql::Connection *connection, int bookID);
 void DB_Rent(sql::Connection *connection, int userID, int bookID);
 int DB_CountRentedBooks(sql::Connection *connection, int userID);
-bool DB_CheckRentedBook(sql::Connection *connection, int userID, string title);
-void DB_ReturnBook(sql::Connection *connection, int userID, string title);
+int DB_CheckRentedBook(sql::Connection *connection, int userID, string title);
+void DB_ReturnBook(sql::Connection *connection, int userID, int bookID);
+bool DB_RegisterAdmin(sql::Connection *connection, string *adminData);
 
 sql::Connection *HandlerSetup(){
     sql::Driver *driver;
@@ -49,7 +53,7 @@ sql::Connection *HandlerSetup(){
         stmt -> execute(UseSchemaQuery);
 
     }catch(sql::SQLException exception){
-        perror(exception.what());
+        std::perror(exception.what());
     }
     delete stmt;
     return connection;
@@ -233,8 +237,8 @@ int DB_CountRentedBooks(sql::Connection *connection, int userID){
     return counter;
 }
 
-bool DB_CheckRentedBook(sql::Connection *connection, int userID, string title){
-    bool userRentedIt = false;
+int DB_CheckRentedBook(sql::Connection *connection, int userID, string title){
+    int bookID = 0;
     if(connection -> isValid()){
         sql::PreparedStatement *p_stmt;
         sql::ResultSet *queryResult;
@@ -243,9 +247,9 @@ bool DB_CheckRentedBook(sql::Connection *connection, int userID, string title){
             p_stmt -> setInt(1, userID);
             queryResult = p_stmt -> executeQuery();
             while(queryResult -> next()){
-                string retrivedTitle = queryResult -> getString("Title");
-                if(retrivedTitle.compare(title) == 0){
-                    userRentedIt = true;
+                string retrievedTitle = queryResult -> getString("Title");
+                if(retrievedTitle.compare(title) == 0){
+                    bookID = queryResult -> getInt("BookID");
                 }
             }
         }catch(sql::SQLException *exception){
@@ -254,11 +258,49 @@ bool DB_CheckRentedBook(sql::Connection *connection, int userID, string title){
         delete p_stmt;
         delete queryResult;
     }
-    return userRentedIt;
+    return bookID;
 }
 
-void DB_ReturnBook(sql::Connection *connection, int userID, string title){
+void DB_ReturnBook(sql::Connection *connection, int userID, int bookID){
     if(connection -> isValid()){
-        
+        sql::PreparedStatement *p_stmt;
+        try{
+            p_stmt = connection -> prepareStatement(ReturnBook_DeleteRow);
+            p_stmt -> setInt(1, userID);
+            p_stmt -> setInt(2, bookID);
+            p_stmt -> execute();
+        }catch(sql::SQLException *exception){
+            std::perror(exception -> what());
+        }
+        try{
+            p_stmt = connection -> prepareStatement(ReturnBook_InsertRow);
+            p_stmt -> setInt(1, userID);
+            p_stmt -> setInt(2, bookID);
+            p_stmt -> execute();
+        }catch(sql::SQLException *exception){
+            std::perror(exception -> what());
+        }
     }
+}
+
+bool DB_RegisterAdmin(sql::Connection *connection, string *adminData){
+    bool registrationSuccess = false;
+    if(connection -> isValid()){
+        sql::PreparedStatement *p_stmt;
+        try{
+            p_stmt = connection -> prepareStatement(RegistrationQuery_Admin);
+            p_stmt -> setString(1, adminData[0]);
+            p_stmt -> setString(2, adminData[1]);
+            p_stmt -> setString(3, adminData[2]);
+            p_stmt -> setInt(4, 1);
+            p_stmt -> setString(5, adminData[3]);
+            
+            if(p_stmt -> execute()){
+                registrationSuccess = true;
+            }
+        }catch(sql::SQLException *exception){
+            std::perror(exception->what());
+        }
+    }
+    return registrationSuccess;
 }
