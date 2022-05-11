@@ -84,7 +84,6 @@ int main(){
             int userChoice = UserMenu_Choice();
             switch(userChoice){
                 case 1:
-                // Search for a book
                     user.SearchBook(con);
                     break;
 
@@ -94,6 +93,15 @@ int main(){
 
                 case 3:
                     user.ReturnBook(con);
+                    break;
+            }
+        }else if(isAdminLoggedin){
+        // ADMIN application
+            AdminMenu();
+            int adminChoice = AdminMenu_Choice();
+            switch(adminChoice){
+                case 1:
+                    admin.AddNewAdmin(con);
             }
         }
              
