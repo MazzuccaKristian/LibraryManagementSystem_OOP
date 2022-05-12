@@ -121,7 +121,7 @@ void UserMenu(){
 void AdminMenu(){
     cout << "--- MENU ---" << endl;
     cout << "1. Add new admin;" << endl;
-    cout << "x. Exit." << endl;
+    cout << "2. Exit." << endl;
 }
 
 int AdminMenu_Choice(){
@@ -130,7 +130,7 @@ int AdminMenu_Choice(){
     do{
         cout << "Enter your option: ";
         cin >> choice;
-        if(choice > 0 && choice < 2){
+        if(choice > 0 && choice < 3){
             isChoiceValid = true;
         }else{
             cout << "Option not allowed." << endl;
