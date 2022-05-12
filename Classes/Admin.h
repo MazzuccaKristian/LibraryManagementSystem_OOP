@@ -38,10 +38,6 @@ void Admin::AddNewAdmin(sql::Connection *connection){
     getline(std::cin, adminRecord[2]);
     std::cout << "Enter role: ";
     getline(std::cin, adminRecord[3]);
-    bool result = DB_RegisterAdmin(connection, adminRecord); 
-    if(result){
-        std::cout << "OK" << std::endl;
-    }else{
-        std::cout << "NO" << std::endl;
-    }
+    DB_RegisterAdmin(connection, adminRecord);
+    std::cout << "Operation completed!" << std::endl; 
 }
