@@ -97,6 +97,12 @@ int main(){
 
                 case 4:
                     user.PostponeReturnDate(con);
+                    break;
+
+                case 5:
+                    cout << "Program ended. Please, wait..." << endl;
+                    isStillWorking = false;
+                    break;
             }
         }else if(isAdminLoggedin){
         // ADMIN application
@@ -106,10 +112,17 @@ int main(){
                 case 1:
                     admin.AddNewAdmin(con);
                     break;
+
+                case 2:
+                    cout << "Program ended. Please, wait..." << endl;
+                    isStillWorking = false;
+                    break;
             }
         }
              
     }while(isStillWorking);
+
+    delete con;
 
     exit(EXIT_SUCCESS);
 }
