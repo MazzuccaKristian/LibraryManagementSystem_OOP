@@ -26,6 +26,7 @@ const string RentedBooks = "SELECT DISTINCT R.BookID, Title FROM Rent AS R JOIN 
 const string ReturnBook_DeleteRow = "DELETE FROM Rent WHERE PersonID = ? AND BookID = ?";
 const string ReturnBook_InsertRow = "INSERT INTO Returning(PersonID, BookID, ReturnDate) VALUES (?, ?, CURDATE())";
 const string RegistrationQuery_Admin = "INSERT INTO User(Name, Surname, Password, isAdmin, Role) VALUES (?, ?, ?, ?, ?)";
+const string PostponeReturnDateQuery = "UPDATE Rent SET ReturnDate = ReturnDate + 7 WHERE PersonID = ? AND BookID = ?";
 
 sql::Connection *HandlerSetup();
 sql::ResultSet *DB_LoginUser(sql::Connection *connection, string *record);
@@ -41,6 +42,7 @@ int DB_CountRentedBooks(sql::Connection *connection, int userID);
 int DB_CheckRentedBook(sql::Connection *connection, int userID, string title);
 void DB_ReturnBook(sql::Connection *connection, int userID, int bookID);
 bool DB_RegisterAdmin(sql::Connection *connection, string *adminData);
+void DB_PostponeReturnDate(sql::Connection *connection, int userID, string title);
 
 sql::Connection *HandlerSetup(){
     sql::Driver *driver;
@@ -301,6 +303,36 @@ bool DB_RegisterAdmin(sql::Connection *connection, string *adminData){
         }catch(sql::SQLException *exception){
             std::perror(exception->what());
         }
+        delete p_stmt;
     }
     return registrationSuccess;
+}
+
+void DB_PostponeReturnDate(sql::Connection *connection, int userID, string title){
+    if(connection -> isValid()){
+        int bookID;
+        try{
+            sql::PreparedStatement *pstmt_getBookID;
+            pstmt_getBookID = connection -> prepareStatement(SearchBookQuery);
+            pstmt_getBookID -> setString(1, title);
+            sql::ResultSet *result = pstmt_getBookID -> executeQuery();
+            if(result -> next()){
+                bookID = result -> getInt("BookID");
+            }
+            delete result;
+            delete pstmt_getBookID;
+        }catch(sql::SQLException *exception){
+            std::perror(exception -> what());
+        }
+        try{
+            sql::PreparedStatement *p_stmt;
+            p_stmt = connection -> prepareStatement(PostponeReturnDateQuery);
+            p_stmt -> setInt(1, userID);
+            p_stmt -> setInt(2, bookID);
+            p_stmt -> execute();
+            delete p_stmt;
+        }catch(sql::SQLException *exception){
+            std::perror(exception -> what());
+        }
+    }
 }
