@@ -20,14 +20,12 @@ class User : public Person {
             : Person{ id, name, surname, password }
             {};
 
-    // private:
-    //     string FormatTitleString(string rawTitle);
-
     public:
         bool SearchBook(sql::Connection *connection);
         void RentBook(sql::Connection *connection);
         string TitleInput();
         void ReturnBook(sql::Connection *connection);
+        void PostponeReturnDate(sql::Connection *connection);
 };
 
 bool User::SearchBook(sql::Connection *connection){
@@ -94,4 +92,12 @@ void User::ReturnBook(sql::Connection *connection){
             }
         }
     }
+}
+
+void User::PostponeReturnDate(sql::Connection *connection){
+    string raw, title;
+    std::cout << "Enter title: ";
+    getline(std::cin, raw);
+    title = FormatTitleString(raw);
+    DB_PostponeReturnDate(connection, this -> getId(), title);
 }
