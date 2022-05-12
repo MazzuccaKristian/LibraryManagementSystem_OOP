@@ -94,6 +94,9 @@ int main(){
                 case 3:
                     user.ReturnBook(con);
                     break;
+
+                case 4:
+                    user.PostponeReturnDate(con);
             }
         }else if(isAdminLoggedin){
         // ADMIN application
@@ -102,6 +105,7 @@ int main(){
             switch(adminChoice){
                 case 1:
                     admin.AddNewAdmin(con);
+                    break;
             }
         }
              
